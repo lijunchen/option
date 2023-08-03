@@ -1,1 +1,1 @@
-module "junchen/option"
+module "github.com/lijunchen/option"
