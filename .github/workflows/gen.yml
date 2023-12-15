@@ -1,0 +1,24 @@
+name: Pull Request Workflow
+on: pull_request
+
+jobs:
+  pull_request_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Read PR details
+        run: |
+          PR_DETAILS=$(jq . < $GITHUB_EVENT_PATH)
+          echo "Pull Request Details: $PR_DETAILS"
+
+      - name: Get PR content using GitHub API
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER=$(jq --raw-output .pull_request.number < $GITHUB_EVENT_PATH)
+          curl \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls/$PR_NUMBER/files"
