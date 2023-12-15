@@ -1,4 +1,0 @@
-package stack
-
-import "github.com/lijunchen/option/stack/lib/A"
-import "github.com/lijunchen/option/stack/lib/B"

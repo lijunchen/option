@@ -1,6 +1,0 @@
-package helloworld
-
-import (
-    "github.com/lijunchen/option/hello"
-    "github.com/lijunchen/option/world/lib"
-)
