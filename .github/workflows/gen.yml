@@ -1,24 +1,34 @@
-name: Pull Request Workflow
-on: pull_request
+name: Push to gh_pages
+
+on:
+  push:
+    branches:
+      - main  # Replace with your branch name if different
 
 jobs:
-  pull_request_job:
+  deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
+    - name: Checkout Repository
+      uses: actions/checkout@v2
 
-      - name: Read PR details
-        run: |
-          PR_DETAILS=$(jq . < $GITHUB_EVENT_PATH)
-          echo "Pull Request Details: $PR_DETAILS"
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'  # Specify the Python version
 
-      - name: Get PR content using GitHub API
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          PR_NUMBER=$(jq --raw-output .pull_request.number < $GITHUB_EVENT_PATH)
-          curl \
-            -H "Authorization: token $GITHUB_TOKEN" \
-            -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls/$PR_NUMBER/files"
+    - name: Install Dependencies
+      run: |
+        pip install pydantic
+
+    - name: Run Script
+      run: python test.py  # Executes your script
+
+    - name: Deploy to gh_pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        deploy_key: ${{ secrets.DEPLOY_KEY }}
+        publish_dir: ./docs
+        publish_branch: gh_pages  # Target branch
+        keep_files: false  # Set to true if you want to keep existing files
