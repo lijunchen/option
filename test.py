@@ -101,3 +101,4 @@ with open(target_dir / "index.md", "w") as f:
                 f2.write("## Dependencies\n\n")
                 for dep in version.deps:
                     f2.write(f"* [{dep[0]}/{dep[1]} {dep[2]}](/{dep[0]}/{dep[1]}/{dep[2]}/index.md)\n")
+
