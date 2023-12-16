@@ -3,7 +3,7 @@ name: Add Checksum to JSON
 on:
   pull_request:
     paths:
-      - 'index/**/*.json'  # This will trigger the action for any JSON file within the 'index' folder
+      - 'index/**/*.json'  # Trigger for any JSON file within the 'index' folder
 
 jobs:
   update-checksum:
@@ -13,34 +13,26 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v2
 
-    - name: Generate and Add Checksum with Python
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.10'
+
+    - name: Install Python dependencies
+      run: pip install requests
+
+    - name: Get All Changed Files
+      id: files
+      uses: jitterbit/get-changed-files@v1
+
+    - name: Run Python Script to Process JSON Files
       run: |
-        FILE_PATH=$(git diff --name-only --diff-filter=A ${{ github.event.before }} ${{ github.event.after }} | grep 'index/.*\.json')
-        if [ -z "$FILE_PATH" ]; then
-          echo "No new JSON file found."
-          exit 0
-        fi
-
-        python3 - <<EOF
-import json
-import hashlib
-import requests
-
-file_path = "$FILE_PATH"
-with open(file_path, 'r') as file:
-    data = json.load(file)
-
-download_url = data.get('download')
-if not download_url:
-    raise ValueError("Download URL not found in JSON.")
-
-response = requests.get(download_url)
-checksum = hashlib.sha256(response.content).hexdigest()
-data['checksum'] = checksum
-
-with open(file_path, 'w') as file:
-    json.dump(data, file, indent=4)
-EOF
+        for file in ${{ steps.files.outputs.all }}; do
+          if [[ $file == index/*.json ]]; then
+            echo "Processing $file"
+            python add_checksum.py $file
+          fi
+        done
 
     - name: Commit and Push Changes
       run: |
