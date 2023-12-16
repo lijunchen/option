@@ -43,3 +43,5 @@ jobs:
         git fetch origin ${{ github.head_ref }}
         git checkout ${{ github.head_ref }}
         git push origin ${{ github.head_ref }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.DEPLOY_KEY }}
