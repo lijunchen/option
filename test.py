@@ -82,7 +82,7 @@ with open(target_dir / "index.md", "w") as f:
     f.write("# MoonCakes Index\n\n")
 
     for cake, versions in metas.cakes.items():
-        f.write(f"* [{cake.username}/{cake.pkgname}](/{ROOT_DIR}/{cake.username}/{cake.pkgname}/index.md)\n")
+        f.write(f"* [{cake.username}/{cake.pkgname}](/{ROOT_DIR}/{cake.username}/{cake.pkgname}/)\n")
 
         # write index.md for each cake
         cake_dir = target_dir / cake.username / cake.pkgname
