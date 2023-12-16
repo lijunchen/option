@@ -16,14 +16,14 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: '3.x'  # Specify the Python version
+        python-version: '3.10'  # Specify the Python version
 
     - name: Install Dependencies
       run: |
         pip install pydantic
 
     - name: Run Script
-      run: python test.py  # Executes your script
+      run: python3 test.py  # Executes your script
 
     - name: Deploy to gh_pages
       uses: peaceiris/actions-gh-pages@v3
