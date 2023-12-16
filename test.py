@@ -17,7 +17,7 @@ class CakeMeta(BaseModel):
     deps: list[Cake]
     download: str
 
-def scan_json_files(directory):
+def scan_json_files(directory) -> dict[Cake, CakeMeta]:
     metas = {}
 
     for root, dirs, files in os.walk(directory):
@@ -40,7 +40,7 @@ def scan_json_files(directory):
                     return Cake(username=username, pkgname=pkgname, version=version)
                 
                 cake = extract_info(relative_path)
-                print(cake)
+                # print(cake)
                 
                 try:
                     with open(file_path, 'r') as f:
@@ -55,5 +55,6 @@ def scan_json_files(directory):
 metas = scan_json_files(".")
 
 for cake, meta in metas.items():
-    print(cake, meta)
+    # print(cake, meta)
+    print(f"[{cake.username} {cake.pkgname} {cake.version}]: {meta.download}")
 
