@@ -33,4 +33,7 @@ jobs:
         publish_branch: gh_pages  # Target branch
         keep_files: false  # Set to true if you want to keep existing files
         enable_jekyll: true
+        force_orphan: true
+        user_name: 'github-actions[bot]'
+        user_email: 'github-actions[bot]@users.noreply.github.com'
   
