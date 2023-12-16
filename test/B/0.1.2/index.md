@@ -4,4 +4,4 @@ Download: [https://mooncakes-public.oss-cn-shenzhen.aliyuncs.com/user/test/B1.2.
 
 ## Dependencies
 
-* [test/D 0.1.3](test/D/0.1.3/index.md)
+* [test/D 0.1.3](/test/D/0.1.3/index.md)
