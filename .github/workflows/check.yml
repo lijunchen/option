@@ -40,4 +40,6 @@ jobs:
         git config --global user.name "GitHub Action"
         git add .
         git commit -m "Add checksum to JSON"
-        git push
+        git fetch origin ${{ github.head_ref }}
+        git checkout ${{ github.head_ref }}
+        git push origin ${{ github.head_ref }}
