@@ -12,6 +12,8 @@ jobs:
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v2
+      with:
+        ref: ${{ github.head_ref }}  # Check out the head branch of the PR
 
     - name: Set up Python
       uses: actions/setup-python@v2
@@ -39,9 +41,7 @@ jobs:
         git config --global user.email "action@github.com"
         git config --global user.name "GitHub Action"
         git add .
-        git commit -m "Add checksum to JSON"
-        git fetch origin ${{ github.head_ref }}
-        git checkout ${{ github.head_ref }}
-        git push origin ${{ github.head_ref }}
+        git commit -m "Add checksum to JSON" || echo "No changes to commit"
+        git push origin HEAD:refs/heads/${{ github.head_ref }}
       env:
         GITHUB_TOKEN: ${{ secrets.DEPLOY_KEY }}
