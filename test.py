@@ -91,7 +91,7 @@ with open(target_dir / "index.md", "w") as f:
             f2.write(f"# {cake.username}/{cake.pkgname}\n\n")
             f2.write("## Versions\n\n")
             for version in versions:
-                f2.write(f"* [{version.version}](./{version.version}/index.md)\n")
+                f2.write(f"* [{version.version}](./{version.version}/)\n")
         
         # write index.md for each version
         for version in versions:
@@ -102,5 +102,5 @@ with open(target_dir / "index.md", "w") as f:
                 f2.write(f"Download: [{version.download}]({version.download})\n\n")
                 f2.write("## Dependencies\n\n")
                 for dep in version.deps:
-                    f2.write(f"* [{dep[0]}/{dep[1]} {dep[2]}](/{ROOT_DIR}/{dep[0]}/{dep[1]}/{dep[2]}/index.md)\n")
+                    f2.write(f"* [{dep[0]}/{dep[1]} {dep[2]}](/{ROOT_DIR}/{dep[0]}/{dep[1]}/{dep[2]}/)\n")
 
