@@ -69,18 +69,20 @@ def scan_json_files(directory) -> Registry:
 metas = scan_json_files(".")
 
 # public dir
-target_dir = Path("public")
+target_dir = Path("docs")
 if target_dir.exists():
     shutil.rmtree(target_dir)
 target_dir.mkdir(exist_ok=True)
 
 # write index.md
 
+ROOT_DIR = "option"
+
 with open(target_dir / "index.md", "w") as f:
     f.write("# MoonCakes Index\n\n")
 
     for cake, versions in metas.cakes.items():
-        f.write(f"* [{cake.username}/{cake.pkgname}](/{cake.username}/{cake.pkgname}/index.md)\n")
+        f.write(f"* [{cake.username}/{cake.pkgname}](/{ROOT_DIR}/{cake.username}/{cake.pkgname}/index.md)\n")
 
         # write index.md for each cake
         cake_dir = target_dir / cake.username / cake.pkgname
@@ -89,7 +91,7 @@ with open(target_dir / "index.md", "w") as f:
             f2.write(f"# {cake.username}/{cake.pkgname}\n\n")
             f2.write("## Versions\n\n")
             for version in versions:
-                f2.write(f"* [{version.version}](/{version.version}/index.md)\n")
+                f2.write(f"* [{version.version}](./{version.version}/index.md)\n")
         
         # write index.md for each version
         for version in versions:
@@ -100,5 +102,5 @@ with open(target_dir / "index.md", "w") as f:
                 f2.write(f"Download: [{version.download}]({version.download})\n\n")
                 f2.write("## Dependencies\n\n")
                 for dep in version.deps:
-                    f2.write(f"* [{dep[0]}/{dep[1]} {dep[2]}](/{dep[0]}/{dep[1]}/{dep[2]}/index.md)\n")
+                    f2.write(f"* [{dep[0]}/{dep[1]} {dep[2]}](/{ROOT_DIR}/{dep[0]}/{dep[1]}/{dep[2]}/index.md)\n")
 
