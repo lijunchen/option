@@ -1,3 +1,6 @@
+import shutil
+from typing import List, Tuple
+from pathlib import Path
 from dataclasses import dataclass
 import os
 import json
@@ -7,18 +10,23 @@ from pydantic import BaseModel
 class Cake(BaseModel):
     username: str
     pkgname: str
-    version: str
+
+    def __eq__(self, other):
+        return (self.username, self.pkgname) == (other.username, other.pkgname)
 
     def __hash__(self):
-        return hash((self.username, self.pkgname, self.version))
+        return hash((self.username, self.pkgname))
 
-class CakeMeta(BaseModel):
-    cake: Cake
-    deps: list[Cake]
+class Version(BaseModel):
+    version: str
     download: str
+    deps: List[Tuple[str, str, str]] # (username, pkgname, version)
 
-def scan_json_files(directory) -> dict[Cake, CakeMeta]:
-    metas = {}
+class Registry(BaseModel):
+    cakes: dict[Cake, List[Version]]
+
+def scan_json_files(directory) -> Registry:
+    cakes = {}
 
     for root, dirs, files in os.walk(directory):
         for file in files:
@@ -27,7 +35,7 @@ def scan_json_files(directory) -> dict[Cake, CakeMeta]:
                 relative_path = os.path.relpath(file_path, directory)
                 print(f"Reading JSON file: {relative_path}")
 
-                def extract_info(path) -> Cake:
+                def extract_info(path) -> (str, str, str):
                     """
                     test/D/0.1.4.json: (test, D, 0.1.4)
                     test/D/asdf/0.1.4.json: (test, D/asdf, 0.1.4)
@@ -37,24 +45,59 @@ def scan_json_files(directory) -> dict[Cake, CakeMeta]:
                     username = parts[0]
                     version = parts[-1].replace(".json", "")
                     pkgname = '/'.join(parts[1:-1])
-                    return Cake(username=username, pkgname=pkgname, version=version)
+                    return username, pkgname, version
                 
-                cake = extract_info(relative_path)
+                username, pkgname, version = extract_info(relative_path)
                 # print(cake)
+
+                cake = Cake(username=username, pkgname=pkgname)
+                if cake not in cakes:
+                    cakes[cake] = []
                 
                 try:
                     with open(file_path, 'r') as f:
                         data = json.load(f)
-                        deps = [Cake(username=fullname.split('/', 1)[0], pkgname=fullname.split('/', 1)[1], version=version) for fullname, version in data['deps'].items()]
-                        metas[cake] = CakeMeta(cake=cake, deps=deps, download=data['download'])
+                        deps = [(fullname.split('/', 1)[0], fullname.split('/', 1)[1], version) for fullname, version in data['deps'].items()]
+                        print(data)
+                        print(deps)
+                        cakes[cake].append(Version(version=version, download=data["download"], deps=deps))
                 except json.JSONDecodeError as e:
                     print(f"Error reading JSON file {file_path}: {e}")
 
-    return metas
+    return Registry(cakes=cakes)
 
 metas = scan_json_files(".")
 
-for cake, meta in metas.items():
-    # print(cake, meta)
-    print(f"[{cake.username} {cake.pkgname} {cake.version}]: {meta.download}")
+# public dir
+target_dir = Path("public")
+if target_dir.exists():
+    shutil.rmtree(target_dir)
+target_dir.mkdir(exist_ok=True)
 
+# write index.md
+
+with open(target_dir / "index.md", "w") as f:
+    f.write("# MoonCakes Index\n\n")
+
+    for cake, versions in metas.cakes.items():
+        f.write(f"* [{cake.username}/{cake.pkgname}](./{cake.username}/{cake.pkgname}/index.md)\n")
+
+        # write index.md for each cake
+        cake_dir = target_dir / cake.username / cake.pkgname
+        cake_dir.mkdir(parents=True, exist_ok=True)
+        with open(cake_dir / "index.md", "w") as f2:
+            f2.write(f"# {cake.username}/{cake.pkgname}\n\n")
+            f2.write("## Versions\n\n")
+            for version in versions:
+                f2.write(f"* [{version.version}]({version.version}/index.md)\n")
+        
+        # write index.md for each version
+        for version in versions:
+            version_dir = cake_dir / version.version
+            version_dir.mkdir(parents=True, exist_ok=True)
+            with open(version_dir / "index.md", "w") as f2:
+                f2.write(f"# {cake.username}/{cake.pkgname} {version.version}\n\n")
+                f2.write(f"Download: [{version.download}]({version.download})\n\n")
+                f2.write("## Dependencies\n\n")
+                for dep in version.deps:
+                    f2.write(f"* [{dep[0]}/{dep[1]} {dep[2]}]({dep[0]}/{dep[1]}/{dep[2]}/index.md)\n")
