@@ -7,14 +7,11 @@ on:
 
 jobs:
   update-checksum:
-    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v2
-      with:
-        ref: ${{ github.head_ref }}  # Check out the head branch of the PR
 
     - name: Set up Python
       uses: actions/setup-python@v2
@@ -43,4 +40,6 @@ jobs:
         git config --global user.name "GitHub Action"
         git add .
         git commit -m "Add checksum to JSON" || echo "No changes to commit"
-        git push origin HEAD:refs/heads/${{ github.head_ref }}
+        git push
+      with:
+          token: ${{ secrets.GITHUB_TOKEN }}
