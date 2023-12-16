@@ -74,33 +74,34 @@ if target_dir.exists():
     shutil.rmtree(target_dir)
 target_dir.mkdir(exist_ok=True)
 
-# write index.md
+# write index.html
 
 ROOT_DIR = "option"
 
-with open(target_dir / "index.md", "w") as f:
-    f.write("# MoonCakes Index\n\n")
+with open(target_dir / "index.html", "w") as f:
+    f.write("<h1>MoonCakes Index</h1>\n\n<ul>\n")
 
     for cake, versions in metas.cakes.items():
-        f.write(f"* [{cake.username}/{cake.pkgname}](/{ROOT_DIR}/{cake.username}/{cake.pkgname}/)\n")
+        f.write(f'<li><a href="/{ROOT_DIR}/{cake.username}/{cake.pkgname}/">{cake.username}/{cake.pkgname}</a></li>\n')
 
-        # write index.md for each cake
+        # write index.html for each cake
         cake_dir = target_dir / cake.username / cake.pkgname
         cake_dir.mkdir(parents=True, exist_ok=True)
-        with open(cake_dir / "index.md", "w") as f2:
-            f2.write(f"# {cake.username}/{cake.pkgname}\n\n")
-            f2.write("## Versions\n\n")
+        with open(cake_dir / "index.html", "w") as f2:
+            f2.write(f"<h1>{cake.username}/{cake.pkgname}</h1>\n\n<h2>Versions</h2>\n<ul>\n")
             for version in versions:
-                f2.write(f"* [{version.version}](./{version.version}/)\n")
+                f2.write(f'<li><a href="./{version.version}/">{version.version}</a></li>\n')
+            f2.write("</ul>\n")
         
-        # write index.md for each version
+        # write index.html for each version
         for version in versions:
             version_dir = cake_dir / version.version
             version_dir.mkdir(parents=True, exist_ok=True)
-            with open(version_dir / "index.md", "w") as f2:
-                f2.write(f"# {cake.username}/{cake.pkgname} {version.version}\n\n")
-                f2.write(f"Download: [{version.download}]({version.download})\n\n")
-                f2.write("## Dependencies\n\n")
+            with open(version_dir / "index.html", "w") as f2:
+                f2.write(f"<h1>{cake.username}/{cake.pkgname} {version.version}</h1>\n\n<p>Download: <a href='{version.download}'>{version.download}</a></p>\n\n<h2>Dependencies</h2>\n<ul>\n")
                 for dep in version.deps:
-                    f2.write(f"* [{dep[0]}/{dep[1]} {dep[2]}](/{ROOT_DIR}/{dep[0]}/{dep[1]}/{dep[2]}/)\n")
+                    f2.write(f'<li><a href="/{ROOT_DIR}/{dep[0]}/{dep[1]}/{dep[2]}/">{dep[0]}/{dep[1]} {dep[2]}</a></li>\n')
+                f2.write("</ul>\n")
+
+    f.write("</ul>\n")
 
