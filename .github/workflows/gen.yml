@@ -32,4 +32,5 @@ jobs:
         publish_dir: ./docs
         publish_branch: gh_pages  # Target branch
         keep_files: false  # Set to true if you want to keep existing files
+        enable_jekyll: true
   
