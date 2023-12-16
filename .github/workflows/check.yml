@@ -36,6 +36,8 @@ jobs:
 
     - name: Commit and Push Changes
       run: |
+        git config --global user.email "action@github.com"
+        git config --global user.name "GitHub Action"
         git add .
         git commit -m "Add checksum to JSON" || echo "No changes to commit"
         git push
